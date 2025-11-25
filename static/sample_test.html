@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Food Detection Test</title>
+</head>
+<body>
+  <h1>Upload Foto Makanan</h1>
+
+  <input type="file" id="fileInput">
+  <button onclick="send()">Scan</button>
+
+  <pre id="output"></pre>
+
+<script>
+async function send() {
+    let f = document.getElementById("fileInput").files[0];
+    let fd = new FormData();
+    fd.append("file", f);
+
+    let res = await fetch("/predict", {
+        method: "POST",
+        body: fd
+    });
+
+    let data = await res.json();
+    document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+}
+</script>
+</body>
+</html>
