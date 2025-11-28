@@ -8,3 +8,5 @@ requests
 python-dotenv
 numpy
 opencv-python
+aiohttp
+asyncio
