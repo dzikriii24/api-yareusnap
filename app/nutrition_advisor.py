@@ -1,56 +1,78 @@
 def build_comprehensive_prompt(food_list, detections):
-    """Optimized prompt untuk response cepat"""
+    """Build comprehensive prompt for nutrition analysis"""
     
     if not food_list:
         food_list = ["Tidak ada makanan terdeteksi"]
     
     food_str = ", ".join(food_list)
     
-    # Build detection details cepat
+    # Build detection details
     detection_details = ""
-    if detections and len(detections) > 0:
-        detection_details = "\nDeteksi: "
-        for det in detections[:3]:  # Hanya 3 teratas
-            detection_details += f"{det['label']}({det['confidence']:.1f}), "
+    if detections:
+        detection_details = "\nDetail deteksi:\n"
+        for det in detections[:5]:  # Limit to top 5 detections
+            detection_details += f"- {det['label']} (confidence: {det['confidence']:.2f})\n"
     
     prompt = f"""
-ANALISIS CEPAT - FORMAT JSON
+ANALISIS MAKANAN DAN NUTRISI - FORMAT JSON
 
-Makanan: {food_str}
+Data Input:
+Makanan yang terdeteksi: {food_str}
 {detection_details}
 
-Analisis cepat:
-- Jenis makanan
-- Komponen utama  
-- Estimasi gizi (protein, karbo, lemak, serat, vitamin)
-- 2 rekomendasi utama
+Tugas Anda sebagai ahli gizi:
+1. ANALISIS JENIS MAKANAN:
+   - Klasifikasikan jenis makanan (berat/ringan/tradisional/modern)
+   - Identifikasi komponen bahan utama
 
-OUTPUT JSON:
+2. ANALISIS KANDUNGAN GIZI:
+   - Protein: estimasi tingkat (tinggi/sedang/rendah)
+   - Karbohidrat: estimasi tingkat (tinggi/sedang/rendah) 
+   - Lemak: estimasi tingkat (tinggi/sedang/rendah)
+   - Serat: estimasi tingkat (tinggi/sedang/rendah)
+   - Vitamin & Mineral: identifikasi yang dominan
+
+3. IDENTIFIKASI KEKURANGAN:
+   - Deteksi potensi kekurangan gizi
+   - Analisis ketidakseimbangan nutrisi
+
+4. REKOMENDASI:
+   - Saran makanan pendamping untuk gizi seimbang
+   - Rekomendasi porsi yang tepat
+   - Tips penyajian yang lebih sehat
+
+FORMAT OUTPUT (JSON):
 {{
-    "food_type": "string",
-    "components": ["item1", "item2"],
+    "food_type": "string (jenis makanan)",
+    "components": ["array", "komponen", "bahan"],
     "nutrition": {{
-        "protein": "tinggi/sedang/rendah",
-        "carbs": "tinggi/sedang/rendah", 
-        "fat": "tinggi/sedang/rendah",
-        "fiber": "tinggi/sedang/rendah",
-        "vitamins": "jenis vitamin"
+        "protein": "string (tinggi/sedang/rendah)",
+        "carbs": "string (tinggi/sedang/rendah)",
+        "fat": "string (tinggi/sedang/rendah)", 
+        "fiber": "string (tinggi/sedang/rendah)",
+        "vitamins": "string (jenis vitamin dominan)"
     }},
-    "deficiencies": ["kekurangan1", "kekurangan2"],
-    "recommendations": ["rekom1", "rekom2"]
+    "deficiencies": ["array", "kekurangan", "gizi"],
+    "recommendations": ["array", "rekomendasi", "saran"]
 }}
 
-Hanya JSON, tanpa penjelasan.
+Hanya kembalikan data JSON, tanpa penjelasan tambahan.
+Analisis dalam konteks makanan Indonesia dan internasional.
 """
 
     return prompt
 
 def build_simple_prompt(food_list):
-    """Super simple prompt untuk kecepatan maksimal"""
-    food_str = ", ".join(food_list) if food_list else "Tidak terdeteksi"
+    """Simple prompt for basic analysis"""
+    food_str = ", ".join(food_list) if food_list else "Tidak ada makanan terdeteksi"
     
     return f"""
-Makanan: {food_str}
-Analisis singkat: jenis, gizi utama, 1 saran.
-Format JSON singkat.
+Analisis makanan: {food_str}
+
+Berikan analisis singkat tentang:
+1. Kandungan gizi utama
+2. Kekurangan nutrisi 
+3. Rekomendasi makanan pendamping
+
+Jawab dalam bahasa Indonesia, ringkas dan praktis.
 """
